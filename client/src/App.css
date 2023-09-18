@@ -1,0 +1,82 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.information {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 20px;
+
+  font-family: sans-serif;
+
+  background-color: darkgrey;
+}
+
+.information input {
+  width: 300px;
+  height: 50px;
+  font-size: 20px;
+  padding-left: 10px;
+}
+
+.information button{
+  width: 315px;
+  height: 50px;
+  margin-top: 15px;
+}
+
+button:hover{
+  cursor: pointer;
+}
+
+.display-employees{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: lightblue;  
+  padding-bottom: 20px;
+}
+
+.employee-display-container{
+  display: flex;
+  align-items: center;
+  border: 3px solid;
+  height: auto;
+  padding: 1%;
+  
+  background-color: #00ffaa;
+}
+
+.employee-display-content{
+  flex:1;
+  width: 100%;
+  padding: 10px;
+  font-family: 'Courier New', Courier, monospace;
+
+  background-color: #8b4141;  
+}
+
+.employee-display h3{
+  margin: 20px;
+}
+
+.action-button-container {
+  width: 25%;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  
+  background-color: magenta;
+}
+
+.action-button-container button {
+  width: auto;
+  height: 50px;
+}
+
