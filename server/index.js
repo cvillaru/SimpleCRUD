@@ -29,13 +29,6 @@ app.post("/create",(req,res)=>{
         req.body.wage
     ]
 
-    // const name = req.body.name
-    // const age = req.body.age
-    // const country = req.body.country
-    // const position = req.body.position
-    // const wage = req.body.wage
-
-
     db.query(q,[val],    
         (err, result)=>{
             if (err){
@@ -46,6 +39,7 @@ app.post("/create",(req,res)=>{
             }
         });
 });
+
 
 app.get("/employees", (req, res) => {
     const q = "SELECT * FROM employees" 
@@ -59,6 +53,22 @@ app.get("/employees", (req, res) => {
         }
     });
 });
+
+
+app.delete("/delete-employee/:id",(req,res)=>{
+    const q = "DELETE FROM employees WHERE id = ?"
+    const data_id = req.params.id;
+
+    db.query(q, data_id,
+    (err,result)=>{
+        if (err) {
+            console.error("Error:", err);
+        } else {
+            res.send(result);
+        }
+    })
+})
+
 
 app.listen(5001, ()=>{
     console.log("Server running on port 5001")

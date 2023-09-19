@@ -1,7 +1,6 @@
 import './App.css';
 import {useState, useEffect} from 'react';
 import axios from 'axios';
-import EmployeeList from './component/comp_EmployeeList';
 
 function App() {
   const rootDB = "http://localhost:5001"
@@ -46,6 +45,17 @@ function App() {
     }
   }
 
+  const handleDeleteEmployee = async (id) => {
+    try {
+      console.log(id);
+      await axios.delete(`${rootDB}/delete-employee/${id}`);
+      console.log("successfully deleted");
+      getEmployees();
+    } catch (error) {
+      console.error("ERROR: ", error);
+    }
+  };
+
 
   return (
     <div className='App'>
@@ -63,7 +73,28 @@ function App() {
         <button onClick={handleAddEmployee}>Add Employee</button>
       </div>
 
-      <EmployeeList employeeList={employeeList} />
+
+      <div className='App'>
+      {employeeList.map((value, key) => (
+        <div className='employee-display-container' key={key}>
+          <div className='employee-display-content'>
+            <h3>Name: {value.name} </h3>
+            <h3>Age: {value.age} </h3>
+            <h3>Country: {value.country}</h3>
+            <h3>Position: {value.position}</h3>
+            <h3>Wage: {value.wage}</h3>
+          </div>
+          <div className='action-button-container'>
+            <button>
+              Update Employee
+            </button>
+            <button onClick={()=>{handleDeleteEmployee(value.id)}}>
+              Delete Employee
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
     </div>
     
   );
