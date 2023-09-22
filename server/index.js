@@ -60,6 +60,20 @@ app.get("/employees", (req, res) => {
     });
 });
 
+app.delete("/delete-employee/:id",(req,res)=>{
+    const q = "DELETE FROM employees WHERE id = ?"
+    const data_id = req.params.id;
+
+    db.query(q, data_id,
+    (err,result)=>{
+        if (err) {
+            console.error("Error:", err);
+        } else {
+            res.send(result);
+        }
+    })
+})
+
 app.listen(5001, ()=>{
     console.log("Server running on port 5001")
 });

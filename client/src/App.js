@@ -1,7 +1,7 @@
 import './App.css';
 import {useState, useEffect} from 'react';
 import axios from 'axios';
-import EmployeeList from './component/comp_EmployeeList';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const rootDB = "http://localhost:5001"
@@ -46,6 +46,16 @@ function App() {
     }
   }
 
+  const handleDeleteEmployee = async (id) => {
+    try {
+      console.log(id);
+      await axios.delete(`${rootDB}/delete-employee/${id}`);
+      console.log("successfully deleted");
+      getEmployees();
+    } catch (error) {
+      console.error("ERROR: ", error);
+    }
+  };
 
   return (
     <div className='App'>
@@ -75,7 +85,7 @@ function App() {
             <h3>Wage: {value.wage}</h3>
           </div>
           <div className='action-button-container'>
-            <button onClick={()=>{handleShowUpdateModal(value.id)}}>
+            <button>
               Update Employee
             </button>
             <button onClick={()=>{handleDeleteEmployee(value.id)}}>
