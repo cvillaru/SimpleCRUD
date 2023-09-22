@@ -1,10 +1,7 @@
 import './App.css';
 import {useState, useEffect} from 'react';
 import axios from 'axios';
-
-import UpdateEmployee from './component/update-modal';
-
-import 'bootstrap/dist/css/bootstrap.min.css';
+import EmployeeList from './component/comp_EmployeeList';
 
 function App() {
   const rootDB = "http://localhost:5001"
@@ -48,47 +45,6 @@ function App() {
       console.log(error)
     }
   }
-
-  const handleDeleteEmployee = async (id) => {
-    try {
-      console.log(id);
-      await axios.delete(`${rootDB}/delete-employee/${id}`);
-      console.log("successfully deleted");
-      getEmployees();
-    } catch (error) {
-      console.error("ERROR: ", error);
-    }
-  };
-
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-
-  const handleShowUpdateModal = (id) => {
-    // Render the UpdateEmployee component within JSX and pass the required props
-    setShow(true);
-    return (
-      <UpdateEmployee employee={id} show={show} handleClose={handleClose}/>
-    );
-  };
-  
-  const handleCloseUpdateModal = () => {
-  };
-
-
-  const handleUpdateEmployee = async (id) => {
-
-    // try {
-    //   // Make an API call to update the employee data with updatedEmployee
-    //   await axios.put(`${rootDB}/update-employee/${employeeId}`, updatedEmployee);
-    //   // Close the modal
-    //   handleCloseUpdateModal();
-    //   // Fetch the updated employee list
-    //   getEmployees();
-    // } catch (error) {
-    //   console.error("ERROR: ", error);
-    // }
-  };
 
 
   return (
