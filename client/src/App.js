@@ -1,6 +1,11 @@
 import './App.css';
 import {useState, useEffect} from 'react';
 import axios from 'axios';
+
+
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -15,6 +20,8 @@ function App() {
     position:"",
     wage:0,
   })
+
+  const [selectedEmployee, setSelectedEmployee] = useState([]);
 
   const getEmployees = async()=>{
     try{
@@ -57,6 +64,21 @@ function App() {
     }
   };
 
+
+
+  const [show, setShow] = useState(false)
+
+  const handleClose = () => setShow(false)
+  const handleUpdateEmployee = (employeeId) => {
+    const selectedEmp = employeeList.find((employee) => employee.id === employeeId)
+
+    setSelectedEmployee(selectedEmp)
+
+    setShow(true)
+
+  };
+
+
   return (
     <div className='App'>
 
@@ -74,6 +96,68 @@ function App() {
         <button onClick={handleAddEmployee}>Add Employee</button>
       </div>
 
+      <>
+        <Modal
+          show={show}
+          onHide={handleClose}
+          backdrop="static"
+          keyboard={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Modal title</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="employeeName">
+              <Form.Label>Name</Form.Label>
+              <Form.Control 
+                type="text"
+                placeholder="Name"
+                value={selectedEmployee.name}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="employeeAge">
+              <Form.Label>Age</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Age"
+                value={selectedEmployee.age}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="employeeCountry">
+              <Form.Label>Country</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Country"
+                value={selectedEmployee.country}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="employeePosition">
+              <Form.Label>Position</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Position"
+                value={selectedEmployee.position}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="employeeWage">
+              <Form.Label>Wage</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Wage"
+                value={selectedEmployee.wage}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="primary">Ok</Button>
+          </Modal.Footer>
+        </Modal>
+      </>
 
       {employeeList.map((value, key) => (
         <div className='employee-display-container' key={key}>
@@ -85,8 +169,8 @@ function App() {
             <h3>Wage: {value.wage}</h3>
           </div>
           <div className='action-button-container'>
-            <button>
-              Update Employee
+            <button onClick={()=>{handleUpdateEmployee(value.id)}}>
+              Update Employee Details
             </button>
             <button onClick={()=>{handleDeleteEmployee(value.id)}}>
               Delete Employee
