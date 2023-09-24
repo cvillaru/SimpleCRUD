@@ -21,12 +21,11 @@ function App() {
     wage:0,
   })
 
-  const [selectedEmployee, setSelectedEmployee] = useState([]);
 
   const getEmployees = async()=>{
     try{
       const res = await axios.get(rootDB+"/employees")
-      console.log(res.data)
+      //console.log(res.data)
       setEmployeeList(res.data)
     }catch(err){
       console.log(err)
@@ -55,9 +54,8 @@ function App() {
 
   const handleDeleteEmployee = async (id) => {
     try {
-      console.log(id);
       await axios.delete(`${rootDB}/delete-employee/${id}`);
-      console.log("successfully deleted");
+      //console.log("successfully deleted");
       getEmployees();
     } catch (error) {
       console.error("ERROR: ", error);
@@ -65,18 +63,53 @@ function App() {
   };
 
 
-
+/////////////// MODAL AND UPDATE EMPLOYEE ///////////////
   const [show, setShow] = useState(false)
+  const [selectedEmployee, setSelectedEmployee] = useState([]);
 
-  const handleClose = () => setShow(false)
-  const handleUpdateEmployee = (employeeId) => {
+  const [updateEmployeeData,setUpdateEmployeeData] = useState({
+    employeeName:"",
+    employeeAge:0,
+    employeeCountry:"",
+    employeePosition:"",
+    employeeWage:0,
+  })
+
+  const handleUpdateInput = (e) => {
+    setUpdateEmployeeData(prev=>({...prev,[e.target.name]: e.target.value}));
+  }
+
+  const handleClose = () => {
+    setSelectedEmployee([]);
+    setShow(false)
+  }
+
+  const handleShowEmployeeDetails = (employeeId) => {
     const selectedEmp = employeeList.find((employee) => employee.id === employeeId)
 
     setSelectedEmployee(selectedEmp)
 
+    setUpdateEmployeeData({
+      employeeName: selectedEmp.name,
+      employeeAge: selectedEmp.age,
+      employeeCountry: selectedEmp.country,
+      employeePosition: selectedEmp.position,
+      employeeWage: selectedEmp.wage,
+    });
+
     setShow(true)
 
   };
+
+  const handleUpdateEmployee = async (id)=>{
+
+    try {
+      await axios.put(rootDB + "/update-employee/" + id, updateEmployeeData);
+      window. location. reload();
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
 
   return (
@@ -104,7 +137,7 @@ function App() {
           keyboard={false}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Modal title</Modal.Title>
+            <Modal.Title>Employee Details</Modal.Title>
           </Modal.Header>
           <Modal.Body>
           <Form>
@@ -113,7 +146,9 @@ function App() {
               <Form.Control 
                 type="text"
                 placeholder="Name"
-                value={selectedEmployee.name}
+                defaultValue={selectedEmployee.name}
+                name="employeeName"
+                onChange={handleUpdateInput}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="employeeAge">
@@ -121,7 +156,9 @@ function App() {
               <Form.Control
                 type="text"
                 placeholder="Age"
-                value={selectedEmployee.age}
+                defaultValue={selectedEmployee.age}
+                name="employeeAge"
+                onChange={handleUpdateInput}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="employeeCountry">
@@ -129,7 +166,9 @@ function App() {
               <Form.Control
                 type="text"
                 placeholder="Country"
-                value={selectedEmployee.country}
+                defaultValue={selectedEmployee.country}
+                name="employeeCountry"
+                onChange={handleUpdateInput}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="employeePosition">
@@ -137,7 +176,9 @@ function App() {
               <Form.Control
                 type="text"
                 placeholder="Position"
-                value={selectedEmployee.position}
+                defaultValue={selectedEmployee.position}
+                name="employeePosition"
+                onChange={handleUpdateInput}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="employeeWage">
@@ -145,8 +186,9 @@ function App() {
               <Form.Control
                 type="text"
                 placeholder="Wage"
-                value={selectedEmployee.wage}
-              />
+                defaultValue={selectedEmployee.wage}
+                name="employeeWage"
+                onChange={handleUpdateInput}/>
             </Form.Group>
           </Form>
         </Modal.Body>
@@ -154,7 +196,9 @@ function App() {
             <Button variant="secondary" onClick={handleClose}>
               Cancel
             </Button>
-            <Button variant="primary">Ok</Button>
+            <Button variant="primary" onClick={()=>{handleUpdateEmployee(selectedEmployee.id)}}>
+              Ok
+            </Button>
           </Modal.Footer>
         </Modal>
       </>
@@ -169,7 +213,7 @@ function App() {
             <h3>Wage: {value.wage}</h3>
           </div>
           <div className='action-button-container'>
-            <button onClick={()=>{handleUpdateEmployee(value.id)}}>
+            <button onClick={()=>{handleShowEmployeeDetails(value.id)}}>
               Update Employee Details
             </button>
             <button onClick={()=>{handleDeleteEmployee(value.id)}}>

@@ -15,9 +15,6 @@ const db = mysql2.createConnection({
     database: "employee_system",
 })
 
-// app.get("/",(req,res)=>{
-//     res.json("Hello From Backend")
-// })
 
 app.post("/create",(req,res)=>{
     const q = "INSERT INTO employees (name,age,country,position,wage) VALUES (?)"
@@ -28,13 +25,6 @@ app.post("/create",(req,res)=>{
         req.body.position,
         req.body.wage
     ]
-
-    // const name = req.body.name
-    // const age = req.body.age
-    // const country = req.body.country
-    // const position = req.body.position
-    // const wage = req.body.wage
-
 
     db.query(q,[val],    
         (err, result)=>{
@@ -72,6 +62,30 @@ app.delete("/delete-employee/:id",(req,res)=>{
             res.send(result);
         }
     })
+})
+
+
+app.put("/update-employee/:id", async (req,res)=>{
+    const employeeId = req.params.id;
+    const q = "UPDATE employees SET `name` = ?, `age` = ?, `country` = ?, `position` = ?, `wage` = ? WHERE id = ?";
+
+    const val = [
+        req.body.employeeName,
+        req.body.employeeAge,
+        req.body.employeeCountry,
+        req.body.employeePosition,
+        req.body.employeeWage,
+        employeeId
+    ]
+
+    db.query(q,[...val],(err,result)=>{
+        if (err){
+            console.error(err);
+        }
+        else{
+            res.json({ message: 'Employee updated successfully' });
+        }
+    });
 })
 
 app.listen(5001, ()=>{
