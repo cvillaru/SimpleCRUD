@@ -6,12 +6,31 @@ import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
+import Alert from 'react-bootstrap/Alert';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
-  const rootDB = "http://localhost:5001"
+  const rootDB = "http://localhost:5001";
 
-  const [employeeList, setEmployeeList] = useState([])
+  
+/////////////// ALERTS ///////////////
+  const [showAlertModal,setShowAlertModal] = useState(false);
+  const handleCloseAlertModal = () => setShowAlertModal(false);
+
+///////////////
+
+  const [employeeList, setEmployeeList] = useState([]);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteEmployee, setDeleteEmployee] = useState([]);
+  const [deleteEmployeeData,setDeleteEmployeeData] = useState({
+    employeeName:"",
+    employeeAge:0,
+    employeeCountry:"",
+    employeePosition:"",
+    employeeWage:0,
+  })
+
 
   const [employee,setEmployee] = useState({
     name:"",
@@ -19,7 +38,7 @@ function App() {
     country:"",
     position:"",
     wage:0,
-  })
+  });
 
 
   const getEmployees = async()=>{
@@ -31,19 +50,31 @@ function App() {
       console.log(err)
     }
   }
-
   useEffect(()=>{
     getEmployees()
   },[])
-
-
   const handleChange = (e)=>{
     setEmployee(prev=>({...prev,[e.target.name]: e.target.value}));
   }
-
   const handleAddEmployee = async e =>{
     e.preventDefault()
+
     try {
+      if(
+        (employee.name === "" || employee.name === null) ||
+        (employee.country === "" || employee.country === null) ||
+        (employee.position === "" || employee.position === null)){
+          return setShowAlertModal(true);
+          //return console.error("Invalid Input");
+      }
+      if(
+        (employee.age <= 0 || employee.age === null) ||
+        (employee.wage <= 0 || employee.wage === null)){
+          return setShowAlertModal(true);
+          //return console.error("Invalid wage");
+      }
+
+
       await axios.post(rootDB+"/create", employee)
       getEmployees()
       window. location. reload();
@@ -52,11 +83,29 @@ function App() {
     }
   }
 
+  const handleCloseConfirmDeletion = () => {
+    setShowDeleteModal(false)
+  }
+
+  const handleShowConfirmDeletion = (employeeId) =>{
+    const deleteEmp = employeeList.find((employee) => employee.id === employeeId);
+    setDeleteEmployee(deleteEmp);
+
+    setDeleteEmployeeData({
+      employeeName: deleteEmp.name,
+      employeeAge: deleteEmp.age,
+      employeeCountry: deleteEmp.country,
+      employeePosition: deleteEmp.position,
+      employeeWage: deleteEmp.wage,
+    });
+    setShowDeleteModal(true);
+  }
+
   const handleDeleteEmployee = async (id) => {
     try {
       await axios.delete(`${rootDB}/delete-employee/${id}`);
-      //console.log("successfully deleted");
       getEmployees();
+      handleCloseConfirmDeletion();
     } catch (error) {
       console.error("ERROR: ", error);
     }
@@ -64,7 +113,7 @@ function App() {
 
 
 /////////////// MODAL AND UPDATE EMPLOYEE ///////////////
-  const [show, setShow] = useState(false)
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState([]);
 
   const [updateEmployeeData,setUpdateEmployeeData] = useState({
@@ -81,7 +130,7 @@ function App() {
 
   const handleClose = () => {
     setSelectedEmployee([]);
-    setShow(false)
+    setShowUpdateModal(false)
   }
 
   const handleShowEmployeeDetails = (employeeId) => {
@@ -97,7 +146,7 @@ function App() {
       employeeWage: selectedEmp.wage,
     });
 
-    setShow(true)
+    setShowUpdateModal(true)
 
   };
 
@@ -111,9 +160,30 @@ function App() {
     }
   }
 
+///////////////
 
   return (
     <div className='App'>
+      <>
+        <Modal
+          show={showAlertModal}
+          onHide={handleCloseAlertModal}
+          backdrop="static"
+          keyboard={false}
+        >
+          <Alert variant="danger">
+            <Alert.Heading>Invalid Input(s)</Alert.Heading>
+            <p>
+              Ensure all inputs are filled in.
+            </p>
+          </Alert>
+          <Modal.Footer>
+            <Button variant="primary" onClick={handleCloseAlertModal}>
+              Ok
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </>
 
       <div className="information">
         <lable>Name: </lable>
@@ -131,7 +201,7 @@ function App() {
 
       <>
         <Modal
-          show={show}
+          show={showUpdateModal}
           onHide={handleClose}
           backdrop="static"
           keyboard={false}
@@ -203,6 +273,40 @@ function App() {
         </Modal>
       </>
 
+      <>
+        <Modal
+          show={showDeleteModal}
+          onHide={handleCloseConfirmDeletion}
+          backdrop="static"
+          keyboard={false}
+          animation={false}
+          centered
+        >
+          <Modal.Header
+            style={{ backgroundColor: "rgba(255, 68, 68, 0.47)"}}
+          >
+            <Modal.Title>WARNING</Modal.Title>
+          </Modal.Header>
+          <Modal.Body
+            style={{ backgroundColor: "rgba(255, 68, 68, 0.47)" }}
+            className="text-center"
+          >
+            About to delete employee.
+            Are you sure?
+          </Modal.Body>
+          <Modal.Footer
+            style={{ backgroundColor: "rgba(255, 68, 68, 0.47)" }}
+          >
+            <Button variant="secondary" onClick={handleCloseConfirmDeletion}>
+              No
+            </Button>
+            <Button variant="danger" onClick={()=>{handleDeleteEmployee(deleteEmployee.id)}}>
+              Yes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </>
+
       {employeeList.map((value, key) => (
         <div className='employee-display-container' key={key}>
           <div className='employee-display-content'>
@@ -212,14 +316,14 @@ function App() {
             <h3>Position: {value.position}</h3>
             <h3>Wage: {value.wage}</h3>
           </div>
-          <div className='action-button-container'>
-            <button onClick={()=>{handleShowEmployeeDetails(value.id)}}>
-              Update Employee Details
-            </button>
-            <button onClick={()=>{handleDeleteEmployee(value.id)}}>
-              Delete Employee
-            </button>
-          </div>
+            <div className="d-grid gap-2">
+              <Button variant="primary" onClick={()=>{handleShowEmployeeDetails(value.id)}}>
+                Update Employee Details
+              </Button>
+              <Button variant="danger" onClick={()=>{handleShowConfirmDeletion(value.id)}}>
+                Delete Employee
+              </Button>
+            </div>
         </div>
       ))}
     </div>
