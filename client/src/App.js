@@ -78,7 +78,7 @@ function App() {
 
       await axios.post(rootDB+"/create", employee)
       getEmployees()
-      window. location. reload();
+      window.location.reload();
     } catch (error) {
       console.log(error)
     }
@@ -155,7 +155,7 @@ function App() {
 
     try {
       await axios.put(rootDB + "/update-employee/" + id, updateEmployeeData);
-      window. location. reload();
+      window.location.reload();
     } catch (error) {
       console.log(error)
     }
